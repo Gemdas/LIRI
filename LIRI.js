@@ -1,6 +1,7 @@
 var twitter = require("twitter");
 var spotify = require("node-spotify-api");
 var request = require("request");
+var inquirer = require("inquirer");
 var key = require("./key.js")
 var fs = require("fs");
 var option = process.argv.slice(2);
@@ -27,12 +28,16 @@ function LIRI(operator)
 			tasks();
 			break;
 		}
+		default :{
+			badEntry();
+			break;
+		}
 	}
 }
 
 function getTitle (titleArray,generic){
 	var title="";
-	if (titleArray[0]!=undefined)
+	if (titleArray[0]!=undefined&&titleArray[0]!="")
 	{
 		for (var i = 0; i < titleArray.length; i++) {
 			title+=titleArray[i]+" ";
@@ -41,8 +46,6 @@ function getTitle (titleArray,generic){
 	else
 	{
 		title=generic
-	}
-	console.log(title);
 	return title;
 }
 
@@ -87,7 +90,12 @@ function moviePrint(movieTitle) {
 	    console.log("Title:                     "+ movieInfo.Title);
 	    console.log("Release Year:              "+movieInfo.Year);
 	    console.log("IMDB RAting:               "+movieInfo.Ratings[0].Value);
-	    console.log("Rotten Tomatos Rating:     "+movieInfo.Ratings[1].Value);
+	    if (movieInfo.Ratings[1]){
+	   	    console.log("Rotten Tomatos Rating:     "+movieInfo.Ratings[1].Value);
+	    }
+	    else{
+	    	console.log("Rotten Tomatos Rating:     This Movie has no rating");	
+	    }
 	    console.log("Country of Origin:         "+movieInfo.Country);
 	    console.log("Original Language:         "+movieInfo.Language);
 	    console.log("Lead Actors and Actresses: "+movieInfo.Actors);
@@ -96,15 +104,34 @@ function moviePrint(movieTitle) {
 		}
 	});	
 }
+
 function tasks(){
 	fs.readFile("random.txt", "utf8", function(error, data) {
 		if (error) {
   			return console.log(error);
   		}
-  		var tasks= data.split("\n");
+  		var tasks= data.split(/\r?\n/);
   		tasks.forEach(function(task, index){
   			tasks[index]=task.split(" ");
   			LIRI(tasks[index]);
   		});
 	});
+}
+function badEntry() {
+	console.log("It seems like you submit a bad entry\n Let's help you get back on track");
+	inquirer.prompt([
+	{
+		type:"list",
+		message:"Which activity do you want me to do",
+		choices:["my-tweets", "spotify-this-song", "movie-this", "do-what-it-says"],
+		name:"activity",
+	},
+	{
+		type:"input",
+		message:"If necessary please input what you want searched otherwise just press enter",
+		name:"search",
+	}	
+	]).then(function(newSearch){
+		LIRI([newSearch.activity, newSearch.search])
+	})
 }
