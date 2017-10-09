@@ -2,7 +2,7 @@ var twitter = require("twitter");
 var spotify = require("node-spotify-api");
 var request = require("request");
 var inquirer = require("inquirer");
-var key = require("./key.js")
+var key = require("./key.js");
 var fs = require("fs");
 var option = process.argv.slice(2);
 LIRI(option);
@@ -46,6 +46,7 @@ function getTitle (titleArray,generic){
 	else
 	{
 		title=generic
+	}
 	return title;
 }
 
@@ -75,12 +76,12 @@ function songPrint(songTitle) {
 	  if (err) {
 	    return console.log('Error occurred: ' + err);
 	  }	 
-	console.log("Song Artist:          " + data.tracks.items[0].artists[0].name);
-	console.log("Song Title:           " + data.tracks.items[0].name); 
-	console.log("You can find it hear: " + data.tracks.items[0].external_urls.spotify);
-	console.log("Album Title:          " + data.tracks.items[0].album.name);
-	console.log("");
-});
+		console.log("Song Artist:          " + data.tracks.items[0].artists[0].name);
+		console.log("Song Title:           " + data.tracks.items[0].name); 
+		console.log("You can find it hear: " + data.tracks.items[0].external_urls.spotify);
+		console.log("Album Title:          " + data.tracks.items[0].album.name);
+		console.log("");
+	});
 }
 
 function moviePrint(movieTitle) {
@@ -112,6 +113,10 @@ function tasks(){
   		}
   		var tasks= data.split(/\r?\n/);
   		tasks.forEach(function(task, index){
+  			if(task==="do-what-it-says")
+  			{
+  				return;
+  			}
   			tasks[index]=task.split(" ");
   			LIRI(tasks[index]);
   		});
